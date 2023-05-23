@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load statement_html %}
+{% block content %}
+
+<p> {%if date_from %}
+    
+   <button onclick="history.go(-1)">
+       <i class="fa fa-chevron-circle-left" style="color:var(--yellow);padding-right:7px;"></i></button> 
+    {{ nrow }} records from {{ date_from }} to {{ date_to }} 
+    {% endif %}
+    </p>
+
+  {{ page_obj | dict_html | safe }} 
+  
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a class="nav-page" href="#" data-id="?page=1">&laquo;</a>
+            <a class="nav-page" href="#" data-id="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="page-current">
+           {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a class="nav-page" href="#" data-id="?page={{ page_obj.next_page_number }}">next</a>
+            <a class="nav-page" href="#" id='check' data-id="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+        {% endif %}
+        
+        <button id="export" class="button" type="submit">save</button>
+    </span>
+    
+</div>
+
+{% if record_count %}
+<p style="font-size:12px;color:#A2A39C">If the bank statement has not been processed before, there should be {{ record_count }} records in the database afterwards.</p>
+{% endif %}
+
+    
+{% endblock %}
+
+{% block custom_js %}
+{% include 'expenses/table_js.html' %}
+
+<script type="text/javascript">
+    
+    var url_params = new URLSearchParams(window.location.search);
+    var order_by = url_params.get('order_by');
+    if (order_by == null){ 
+        order_by = "date"
+    }
+    
+    $('#' + url_params.get('order_by')).css("color", "#b19693");
+    
+    $('.sort-table').on("click", function() {     
+        new_order = $(this).parent().text(); 
+        desc = url_params.get('desc') == "false";
+
+        url = "?page=1&order_by=" + new_order + "&desc=" + desc.toString();
+        window.location.href = url;
+    });
+    
+    $('.nav-page').on("click", function() {
+        var page_query = $(this).attr("data-id");
+                 
+        url = page_query + "&order_by=" + order_by + "&desc=" + url_params.get('desc');
+        window.location.href = url;
+         
+        
+    });
+    
+    
+</script>
+
+{% endblock custom_js %}
+

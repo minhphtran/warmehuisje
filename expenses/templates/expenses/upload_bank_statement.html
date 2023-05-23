@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<p>The league for fighting charted accountancy</p>
+<form action="{% url 'bank-statement-upload' %}" method="post" class="uploader" enctype="multipart/form-data" data-ajax="false">
+    {% csrf_token %}
+    {% for field in form %}
+        {% for error in field.errors %}
+                    <div class="alert alert-error" style = "color:#4939F3">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}   
+    
+     <label for="id_file" id="file-drag">
+            {{ field }}
+         <div id="start">
+      <i class="fa fa-download" aria-hidden="true"></i>
+      <div style="line-height:24px;font-size:14px">
+          {% if ms %}
+           {{ ms|safe }}
+          {% else %}
+          Select file
+          {% endif %}
+          
+             </div>
+    </div>
+    <div id="response" class="hidden">
+      <div id="messages"></div>
+    </div>
+         <input type="submit" id="file-upload-btn" class="btn btn-primary"value= 'Load records'>
+  </label>
+    {% endfor %}
+</form>
+    
+{% endblock %}

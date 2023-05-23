@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form action="{% url 'expense-content' %}" method="get" class='expense-form'>
+    {% csrf_token %}
+    <p class="division"> Records in <a href="#" class="category-select"> all </a> categories
+        {% for field in form %} 
+            {% if field.name == 'date_from' %}
+               from {{ field }}
+            {% elif field.name == 'date_to' %}
+               to {{ field }}
+            {% endif %}
+        {% endfor %}
+        of money leaving our pocket..
+        <button name="chart" id="chart" type="submit" style='display:none'></button>
+        <button href = "#" name="edit" type="submit"><i class="fa fa-database" aria-hidden="true"></i></button>
+        <a href = "{% url 'bank-statement-upload' %}"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+        </p>
+    <!-- CONTENT -->
+          <div style="display: flex">
+              
+        {% for field in form %} 
+            {% if field.name == 'categories' %}
+    <div class="category-wrapper"> {{ field }} </div>
+            {% endif %}
+        {% endfor %}
+        
+       <div id="shrinkage"  style="display: flex;padding-right:70px;width:80%">
+        <!-- info -->
+        <div id="container5">
+          
+          {% for stat in stats %}  
+          <div id="score{{ stat.indx }}" class="scoreContainer">
+              <div class="score-title">{{ stat.cat|safe }}</div>
+              <div class="score">&euro;{{ stat.sum }}</div>
+              <div class="scoreInc">{{ stat.diff|safe }}</div>
+              {% if stat.txt %}
+              <div class="scoreInc text">{{ stat.txt|safe }}</div>
+              {% endif %}
+        </div>
+            {% endfor %}
+            
+          
+            </div>
+        
+        
+        <!-- chart -->
+         <div id="container4" style="background-color:#e9dfd5;" data-highcharts-chart="0"><div id="highcharts-hqqrsdo-0" dir="ltr" class="highcharts-container"></div></div>
+            
+            </div>
+        
+      </div>
+    
+    
+</form>
+
+
+    
+{% endblock %}
+
+{% block custom_js %}
+<script>
+$(document).ready(function(){
+  $(".category-select").click(function(e){
+      e.stopPropagation();
+    $(".category-picker").toggleClass("hide");
+  });
+    $('input.category-picker').wrap( '<i class="fa fa-check"></i>' )
+    $(document).click(function(){  
+  $(".category-picker").addClass("hide");
+  });
+  $(".category-picker").click(function(e){  
+      e.stopPropagation();
+  })
+    
+    
+  $("input.category-picker").each(function() {
+    var opacity = "0";
+      if ($(this).is(":checked")){ opacity = "1"};
+      $(this).parent().css("opacity", opacity);
+  });
+  if ($('input.category-picker').not(':checked').length != 0){
+          $(".category-select").html('selected')
+      }else{
+          $(".category-select").html('all')
+      }
+    
+  $("input.category-picker").click(function(e){  
+      var opacity = "0";
+      if ($(this).is(":checked")){ opacity = "1"};
+      $(this).parent().css("opacity", opacity);
+      
+      if ($('input.category-picker').not(':checked').length != 0){
+          $(".category-select").html('selected')
+      }else{
+          $(".category-select").html('all')
+      }
+  })
+    
+    $(".chart").click()
+  
+});
+</script>
+
+<script>
+
+$(document).keydown(function(event){
+    if (event.keyCode === 13) {
+        event.stopPropagation();
+        event.preventDefault();
+        $("#chart").click();
+    }
+    
+    if ( event.shiftKey && event.keyCode === 67){
+        $(".category-select").click()
+    }
+    
+    
+    });
+</script>    
+
+<script>
+$(document).ready(function(){
+  $("#id_categories").append('<li><a href="#" class="select-all">Click all</a></li>');
+  $('.select-all').click(function(){
+    $(".category-picker").click();
+});
+});
+</script>
+
+{% include 'warmehuisje/table_js.html' %}
+
+{% endblock custom_js %}
