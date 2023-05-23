@@ -1,6 +1,6 @@
 
 # household helper
-A silly app to help us monitor our spendings.
+A silly app built to monitor our spendings.
 
 ![](assets/home2.png)
 
